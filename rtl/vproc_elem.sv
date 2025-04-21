@@ -301,6 +301,16 @@ module vproc_elem #(
                 result_mask_d  = ~pipe_in_ctrl_i.vl_0;
                 result_valid_d = pipe_in_ctrl_i.last_cycle;
             end
+            ELEM_ECHO_START: begin 
+            	pipe_out_xreg_data_o = 32'hCAFEBABE;   // any number which is not duplicate
+				pipe_out_xreg_valid_o = 1'b1; // ensure enable
+				//$display("ELEM_ECHO_START in vproc_elem catched");
+            end
+            ELEM_ECHO_STOP: begin 
+            	pipe_out_xreg_data_o = 32'h00000001;   // any number which is not duplicate
+				pipe_out_xreg_valid_o = 1'b0; // ensure enable
+				//$display("ELEM_ECHO_STOP in vproc_elem catched");
+            end 	
             default: ;
 
         endcase

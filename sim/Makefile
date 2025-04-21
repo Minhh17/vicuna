@@ -110,7 +110,7 @@ $(PROJ_DIR)/obj_dir/Vvproc_top.mk: verilator-version-check $(VPROC_CONFIG_PKG)
 	    -GICACHE_SZ=$(ICACHE_SZ) -GICACHE_LINE_W=$(ICACHE_LINE_W)             \
 	    -GDCACHE_SZ=$(DCACHE_SZ) -GDCACHE_LINE_W=$(DCACHE_LINE_W)             \
 	    --cc $$src vproc_pkg.sv $(VPROC_CONFIG_PKG) vproc_top.sv vproc_xif.sv \
-	    vproc_vregpack.sv vproc_vregunpack.sv --top-module vproc_top          \
+	    vproc_vregpack.sv vproc_vregunpack.sv echo.sv --top-module vproc_top          \
 	    --clk clk_i $$options $$cflags --exe verilator_main.cpp
 
 vivado: $(VPROC_CONFIG_PKG)

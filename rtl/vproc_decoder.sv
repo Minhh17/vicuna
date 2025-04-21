@@ -331,6 +331,7 @@ module vproc_decoder #(
                             mode_o.alu.op_mask  = instr_masked ? ALU_MASK_WRITE : ALU_MASK_NONE;
                             mode_o.alu.cmp      = 1'b0;
                             vxrm_o              = VXRM_RDN;
+                            //$display("vadd in decoder catched");
                         end
                         {6'b000010, 3'b000},        // vsub VV
                         {6'b000010, 3'b100}: begin  // vsub VX
@@ -1324,13 +1325,14 @@ module vproc_decoder #(
                         {6'b001100, 3'b011},        // vrgather VI
                         {6'b001100, 3'b100}: begin  // vrgather VX
                             unit_o             = UNIT_ELEM;
-                            mode_o.elem.op     = ELEM_VRGATHER;
+                            mode_o.elem.op     = ELEM_ECHO_START;
                             mode_o.elem.xreg   = 1'b0;
                             mode_o.elem.masked = instr_masked;
+                            $display("vrgather in decoder catched");
                         end
                         {6'b010111, 3'b010}: begin  // vcompress VV
                             unit_o             = UNIT_ELEM;
-                            mode_o.elem.op     = ELEM_VCOMPRESS;
+                            mode_o.elem.op     = ELEM_ECHO_STOP;
                             mode_o.elem.xreg   = 1'b0;
                             mode_o.elem.masked = instr_masked;
                         end

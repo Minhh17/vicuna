@@ -13,7 +13,7 @@ ifeq ($(COMPILER),gcc)
     RISCV_CC            := riscv32-unknown-elf-gcc
     RISCV_DUMP          := riscv32-unknown-elf-objdump
     RISCV_OBCP          := riscv32-unknown-elf-objcopy
-    ARCH                := rv32imv
+    ARCH                := rv32imzve32x
     LD_SCRIPT           := $(SW_DIR)/link.ld
 else ifeq ($(COMPILER),llvm)
     # Pick the first clang executable in $PATH with version >= 14, or the
@@ -38,9 +38,8 @@ endif
 
 RISCV_FLAGS := -march=$(ARCH) -mabi=ilp32 -static -mcmodel=medany             \
                -fvisibility=hidden -nostdlib -nostartfiles -Wall              \
-               $(CC_SPECIFIC_OPTIONS)
-
-CFLAGS := $(CFLAGS) -I$(SW_DIR)/lib/
+               $(CC_SPECIFIC_OPTIONS) 
+CFLAGS := $(CFLAGS) -I$(SW_DIR)/lib/ -I/opt/riscv/lib/gcc/riscv32-unknown-elf/14.2.0/include/ 
 
 PROG ?= test
 OBJ  ?= test.o

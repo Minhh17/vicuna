@@ -164,7 +164,8 @@ int main(int argc, char **argv) {
             int i;
             for (i = 0; i < mem_latency; i++) {
                 mem_rvalid_queue[i] = 0;
-            }
+            }          
+            
             top->mem_rvalid_i = 0;
             top->clk_i        = 0;
             top->rst_ni       = 0;
@@ -177,7 +178,8 @@ int main(int argc, char **argv) {
             }
             top->rst_ni = 1;
             top->eval();
-
+                                  
+            
             int end_cnt    = 0, // count number of cycles after address 0 was requested
                 abort_cnt  = 0; // count number of cycles since mem_req_o last toggled
             while (end_cnt < extra_cycles) {

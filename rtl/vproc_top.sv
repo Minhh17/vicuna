@@ -354,6 +354,18 @@ module vproc_top import vproc_pkg::*; #(
 `endif
 `endif
 
+	
+	// ECHO INTEGRATION 
+	logic [15:0][511:0] shaver_vreg_bus;	
+	logic [15:0][511:0] echo_vreg_out;   // result of echo module
+
+	// logic echo_trigger 
+	echo echo_inst (
+         .clk           (clk),         
+         .rst           (reset),    
+         .echo_data_in  (shaver_vreg_bus),  
+         .echo_data_out (echo_vreg_out)    
+    );	 
 
     ///////////////////////////////////////////////////////////////////////////
     // VECTOR CORE INTEGRATION
@@ -437,6 +449,9 @@ module vproc_top import vproc_pkg::*; #(
         .csr_vxsat_o        ( csr_vxsat_rd       ),
         .csr_vxsat_i        ( csr_vxsat_wr       ),
         .csr_vxsat_set_i    ( csr_vxsat_wren     ),
+        
+        .shaver_vreg_bus     (shaver_vreg_bus),  // Bus export 16vreg (v0–v15)
+        .echo_vreg_out      (echo_vreg_out),    // Bus receive result from Echo (for write to vreg v16–v31)        
 
         .pend_vreg_wr_map_o ( pend_vreg_wr_map_o )
     );

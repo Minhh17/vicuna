@@ -221,7 +221,7 @@ typedef struct packed {
 `endif
 } op_mode_sld;
 
-typedef enum logic [3:0] {
+typedef enum logic [4:0] {
     ELEM_XMV,
     ELEM_VPOPC,
     ELEM_VFIRST,
@@ -237,6 +237,8 @@ typedef enum logic [3:0] {
     ELEM_VREDMINU,
     ELEM_VREDMIN,
     ELEM_VREDMAXU,
+    ELEM_ECHO_START,
+    ELEM_ECHO_STOP,
     ELEM_VREDMAX
 } opcode_elem;
 
