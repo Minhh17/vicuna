@@ -237,8 +237,7 @@ typedef enum logic [4:0] {
     ELEM_VREDMINU,
     ELEM_VREDMIN,
     ELEM_VREDMAXU,
-    ELEM_ECHO_START,
-    ELEM_ECHO_STOP,
+    ELEM_ACCEL,
     ELEM_VREDMAX
 } opcode_elem;
 

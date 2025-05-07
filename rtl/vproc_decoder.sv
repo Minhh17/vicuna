@@ -244,6 +244,35 @@ module vproc_decoder #(
                 endcase
 
             end
+            
+            7'b0001011: begin
+				// ----------------------------------------------------------------
+				//  Echo-ACCEL:  rd = vd   rs1 = vs1   rs2 = vs2
+				// ----------------------------------------------------------------
+				if (instr_i[14:12] == 3'b101) begin           // <── FUNCT3 lọc lệnh
+					// 1) Chọn pipeline ELEM
+					unit_o              = UNIT_ELEM;
+
+					// 2) Chọn opcode con bên trong ELEM
+					mode_o.elem.op      = ELEM_ACCEL;         // enum bạn đã thêm trong vproc_pkg.sv
+					mode_o.elem.xreg    = 1'b0;               // không truy cập x-reg
+					mode_o.elem.masked  = 1'b0;               // không dùng v0 mask
+
+					// 3) Khai báo nguồn / đích
+					//    (instr_vs? & instr_vd đã có trong đoạn decoder gốc)
+					rs1_o.vreg          = 1'b1;               // rs1 là vector
+					rs1_o.r.vaddr       = instr_vs1;          // đọc v[vs1]
+
+					rs2_o.vreg          = 1'b1;               // rs2 là vector
+					rs2_o.r.vaddr       = instr_vs2;          // đọc v[vs2]
+
+					rd_o.vreg           = 1'b1;               // ghi vector đích
+					rd_o.addr           = instr_vd;           // ghi v[vd]
+
+					// Không gán gì tới valid_o – Vicuna tự tạo ở cuối file
+				end
+				// ---- các funct3 khác của CUSTOM-0 (nếu có) vẫn bỏ qua ----
+			end
 
             // OPCODE VECTOR:
             7'h57: begin
@@ -1325,14 +1354,13 @@ module vproc_decoder #(
                         {6'b001100, 3'b011},        // vrgather VI
                         {6'b001100, 3'b100}: begin  // vrgather VX
                             unit_o             = UNIT_ELEM;
-                            mode_o.elem.op     = ELEM_ECHO_START;
+                            mode_o.elem.op     = ELEM_VRGATHER;
                             mode_o.elem.xreg   = 1'b0;
                             mode_o.elem.masked = instr_masked;
-                            $display("vrgather in decoder catched");
                         end
                         {6'b010111, 3'b010}: begin  // vcompress VV
                             unit_o             = UNIT_ELEM;
-                            mode_o.elem.op     = ELEM_ECHO_STOP;
+                            mode_o.elem.op     = ELEM_VCOMPRESS;
                             mode_o.elem.xreg   = 1'b0;
                             mode_o.elem.masked = instr_masked;
                         end

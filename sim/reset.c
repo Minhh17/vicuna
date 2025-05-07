@@ -1,22 +1,23 @@
 #include <stdint.h>
 #include <uart.h>
 
-volatile int32_t data_v0[16] __attribute__ ((aligned (64))) = {999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999};
-volatile int32_t data_v1[16] __attribute__ ((aligned (64))) = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
-volatile int32_t data_v2[16] __attribute__ ((aligned (64))) = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
-volatile int32_t data_v3[16] __attribute__ ((aligned (64))) = {300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300};
-volatile int32_t data_v4[16] __attribute__ ((aligned (64))) = {400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400};
-volatile int32_t data_v5[16] __attribute__ ((aligned (64))) = {500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500};
-volatile int32_t data_v6[16] __attribute__ ((aligned (64))) = {600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600};
-volatile int32_t data_v7[16] __attribute__ ((aligned (64))) = {700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700};
-volatile int32_t data_v8[16] __attribute__ ((aligned (64))) = {800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800};
-volatile int32_t data_v9[16] __attribute__ ((aligned (64))) = {900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900};
-volatile int32_t data_v10[16] __attribute__ ((aligned (64))) = {1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
-volatile int32_t data_v11[16] __attribute__ ((aligned (64))) = {1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100};
-volatile int32_t data_v12[16] __attribute__ ((aligned (64))) = {1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200};
-volatile int32_t data_v13[16] __attribute__ ((aligned (64))) = {1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300};
-volatile int32_t data_v14[16] __attribute__ ((aligned (64))) = {1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400};
-volatile int32_t data_v15[16] __attribute__ ((aligned (64))) = {1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500};
+volatile int32_t data_v0[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v1[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v2[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v3[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v4[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v5[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v6[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v7[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v8[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v9[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v10[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v11[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v12[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v13[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v14[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+volatile int32_t data_v15[16] __attribute__ ((aligned (64))) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 
 volatile int32_t check_input[16][16] __attribute__ ((aligned (64)));
 volatile int32_t result[16][16] __attribute__ ((aligned (64)));
@@ -247,7 +248,19 @@ int main(void) {
         uart_printf("\n");
     }
     
-    uart_printf("Checkpoint 3...\n");   
+    uart_printf("Checkpoint 3...\n");
+
+    // active module Echo in test.c
+    uart_printf("Activating Echo module...\n");
+    uint32_t dummy = 0xCAFEBABE;  // random, not important 
+
+    asm volatile (
+        "vrgather.vx v0, v0, %0\n"
+        :                 
+        : "r"(dummy)      
+        : "v0", "memory"  
+    );
+    uart_printf("Checkpoint 4...\n");
 
 	asm volatile(".word 0x0000580B");
 
@@ -277,34 +290,6 @@ int main(void) {
         uart_printf("Vector register v%d: ", i + 16);
         for (int j = 0; j < 16; j++) {
             uart_printf("%d ", result[i][j]);
-        }
-        uart_printf("\n");
-    }
-    
-    // Kiểm tra dữ liệu đã load vào v0 đến v15 bằng cách lưu từng thanh ghi riêng lẻ
-    asm volatile("vse32.v v0, (%0)" : : "r"(check_input[0]) : "memory");
-    asm volatile("vse32.v v1, (%0)" : : "r"(check_input[1]) : "memory");
-    asm volatile("vse32.v v2, (%0)" : : "r"(check_input[2]) : "memory");
-    asm volatile("vse32.v v3, (%0)" : : "r"(check_input[3]) : "memory");
-    asm volatile("vse32.v v4, (%0)" : : "r"(check_input[4]) : "memory");
-    asm volatile("vse32.v v5, (%0)" : : "r"(check_input[5]) : "memory");
-    asm volatile("vse32.v v6, (%0)" : : "r"(check_input[6]) : "memory");
-    asm volatile("vse32.v v7, (%0)" : : "r"(check_input[7]) : "memory");
-    asm volatile("vse32.v v8, (%0)" : : "r"(check_input[8]) : "memory");
-    asm volatile("vse32.v v9, (%0)" : : "r"(check_input[9]) : "memory");
-    asm volatile("vse32.v v10, (%0)" : : "r"(check_input[10]) : "memory");
-    asm volatile("vse32.v v11, (%0)" : : "r"(check_input[11]) : "memory");
-    asm volatile("vse32.v v12, (%0)" : : "r"(check_input[12]) : "memory");
-    asm volatile("vse32.v v13, (%0)" : : "r"(check_input[13]) : "memory");
-    asm volatile("vse32.v v14, (%0)" : : "r"(check_input[14]) : "memory");
-    asm volatile("vse32.v v15, (%0)" : : "r"(check_input[15]) : "memory");
-
-    // In dữ liệu từ v0 đến v15 lần nữa để kiểm tra
-    uart_printf("Data loaded into v0 to v15 again:\n");
-    for (int i = 0; i < 16; i++) {
-        uart_printf("Vector register v%d: ", i);
-        for (int j = 0; j < 16; j++) {
-            uart_printf("%d ", check_input[i][j]);
         }
         uart_printf("\n");
     }

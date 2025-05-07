@@ -41,8 +41,7 @@ module vproc_core import vproc_pkg::*; #(
         
         input  logic [15:0][VREG_W-1:0]  echo_vreg_out,
         output logic [15:0][VREG_W-1:0]  shaver_vreg_bus, // 16 vreg export to top, 512 bit
-        input  logic                     echo_enable,
-
+        
         // eXtension interface
         vproc_xif.coproc_issue           xif_issue_if,
         vproc_xif.coproc_commit          xif_commit_if,
@@ -67,7 +66,7 @@ module vproc_core import vproc_pkg::*; #(
         input  logic                     csr_vxsat_i,
         input  logic                     csr_vxsat_set_i,
 
-        output logic [31:0]              pend_vreg_wr_map_o
+        output logic [31:0]              pend_vreg_wr_map_o        	   
     );
 
     if ((VREG_W & (VREG_W - 1)) != 0 || VREG_W < 64) begin
@@ -863,18 +862,20 @@ module vproc_core import vproc_pkg::*; #(
             end
         end
     endgenerate
-
 	
 	//// Echo Module FSM 	
 	logic [15:0][VREG_W-1:0] echo_buffer_temp;
-	logic [3:0] echo_read_cnt;
-	logic [3:0] echo_write_cnt;
+	logic [4:0] echo_read_cnt;
+	logic [4:0] echo_write_cnt;
 	logic       elem_xreg_valid_d;
 	logic       elem_xreg_valid_rise;
+	logic  echo_start_int;
+	logic  echo_done;
 
 	typedef enum logic [2:0] {
 		S_IDLE,
-		S_READ,
+		S_READ_ADDR,
+		S_READ_DATA,
 		S_ECHO,
 		S_WRITE,
 		S_DONE
@@ -882,81 +883,75 @@ module vproc_core import vproc_pkg::*; #(
 
 	fsm_e echo_state;
 
-	// Bắt cạnh lên của elem_xreg_valid
-	always_ff @(posedge clk_i or negedge rst_ni) begin
-		if (!rst_ni) begin
-		    elem_xreg_valid_d <= 1'b0;
-		end else begin
-		    elem_xreg_valid_d <= elem_xreg_valid;
-		end
-	end
-
-	assign elem_xreg_valid_rise = (elem_xreg_valid == 1'b1) && (elem_xreg_valid_d == 1'b0);
-
 	// FSM chính
 	always_ff @(posedge clk_i or negedge rst_ni) begin
 		if (!rst_ni) begin
 		    echo_state         <= S_IDLE;
-		    echo_read_cnt      <= 4'd1;
-		    echo_write_cnt     <= 4'd1;
+		    //echo_read_cnt      <= 4'd0;
+		    echo_write_cnt     <= 4'd0;
 		    vregfile_wr_en_q[0] <= 0;
 		end else begin
 		    case (echo_state)
 
 		        S_IDLE: begin
-		            if (elem_xreg_valid_rise && elem_xreg_data == 32'hCAFEBABE) begin
-		                echo_read_cnt <= 4'd1;
-		                echo_state    <= S_READ;
+		            if (echo_start_int ==1) begin
+		                echo_read_cnt <= 4'd0;
+		                echo_done <= 1'b0;
+		                echo_state    <= S_READ_ADDR;
 		                $display(">>> [FSM] Start Reading 16 vector registers");
 		            end
 		        end
 
-		        S_READ: begin
-		            vregfile_rd_addr[0] <= echo_read_cnt;
-		            echo_buffer_temp[echo_read_cnt] <= vregfile_rd_data[0];
-
-		            $display("READ vreg[%0d] = %h", echo_read_cnt, vregfile_rd_data[0]);
-
-		            if (echo_read_cnt == 4'd16) begin
-		                echo_read_cnt <= 4'd1;
+		        S_READ_ADDR: begin					              		            
+		            if (echo_read_cnt <= 4'd14) begin		            							
+		            	vregfile_rd_addr[0] <= echo_read_cnt;
+		            	vregfile_rd_addr[1] <= echo_read_cnt+1;		            			            				                
+		                echo_state    <= S_READ_DATA;
+		                		                		                
+		            end else begin		            			               
+		                echo_read_cnt <= 4'd0;
+		            	$display(">>> [FSM] Finished buffering, moving to ECHO");
 		                echo_state    <= S_ECHO;
-		                $display(">>> [FSM] Finished buffering, moving to ECHO");
-		            end else begin
-		                echo_read_cnt <= echo_read_cnt + 1;
-		            end
+		            end		            		           
+		        end
+
+		        S_READ_DATA: begin
+		            echo_buffer_temp[echo_read_cnt] <= vregfile_rd_data[0];
+		            echo_buffer_temp[echo_read_cnt+1] <= vregfile_rd_data[1];
+		            echo_read_cnt <= echo_read_cnt + 4'd2;
+		            $display("READ vreg[%0d] = %h", echo_read_cnt, vregfile_rd_data[0]);
+		            $display("READ vreg[%0d] = %h", echo_read_cnt+1, vregfile_rd_data[1]);		            
+		            echo_state    <= S_READ_ADDR;		            		            
 		        end
 
 		        S_ECHO: begin
 		            shaver_vreg_bus <= echo_buffer_temp;
-		            echo_state      <= S_WRITE;
+		            echo_state      <= S_TEST_ADDR;
 		            echo_write_cnt  <= 0;
-		            $display(">>> [FSM] Start ECHO then WRITE");
+		            $display(">>> [FSM] Start ECHO then WRITE");		           
 		        end
-
+				
 		        S_WRITE: begin
 		            vregfile_wr_en_q[0]   <= 1'b1;
 		            vregfile_wr_addr_q[0] <= 5'd16 + echo_write_cnt;
 		            vregfile_wr_data_q[0] <= echo_vreg_out[echo_write_cnt];
 		            vregfile_wr_mask_q[0] <= '1;
 
-		            $display("WRITE vreg[%0d] = %h", 16 + echo_write_cnt, echo_vreg_out[echo_write_cnt]);
+		            //$display("WRITE vreg[%0d] = %h", 16 + echo_write_cnt, echo_vreg_out[echo_write_cnt]);
 
-		            if (echo_write_cnt == 4'd15) begin
+		            if (echo_write_cnt > 4'd15) begin
 		                vregfile_wr_en_q[0] <= 0;
-		                echo_state          <= S_DONE;
-		                $display(">>> [FSM] Completed Echo, entering DONE state");
+		                //echo_state          <= S_DONE;
+		                //$display(">>> [FSM] Completed Echo, entering DONE state");
 		            end else begin
 		                echo_write_cnt <= echo_write_cnt + 1;
 		            end
 		        end
 
 		        S_DONE: begin
-		            $display(">>> [FSM] Echo Done - waiting for STOP signal...");
-		            // Nếu có STOP tín hiệu, reset về IDLE
-		            if (elem_xreg_valid_rise && elem_xreg_data == 32'h00000000) begin
-		                echo_state <= S_IDLE;
-		                $display(">>> [FSM] Echo reset to IDLE via STOP signal");
-		            end
+		            //$display(">>> [FSM] Echo Done - exiting FSM");
+				    //echo_done        <= 1'b1;	
+				    //echo_state          <= S_IDLE;	            
 		        end
 
 		    endcase
@@ -1120,7 +1115,9 @@ module vproc_core import vproc_pkg::*; #(
                 .xreg_ready_i             ( xreg_ready                 ),
                 .xreg_id_o                ( xreg_id                    ),
                 .xreg_addr_o              ( xreg_addr                  ),
-                .xreg_data_o              ( xreg_data                  )
+                .xreg_data_o              ( xreg_data                  ),
+                .echo_start_o             ( echo_start_int              ),
+                .echo_done_i              ( echo_done  )
             );
             if (PIPE_UNITS[i][UNIT_LSU]) begin
                 assign pending_load_lsu           = pending_load;

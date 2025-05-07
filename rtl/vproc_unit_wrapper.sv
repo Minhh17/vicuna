@@ -64,7 +64,10 @@ module vproc_unit_wrapper import vproc_pkg::*; #(
         input  logic                                 xreg_ready_i,
         output logic    [XIF_ID_W              -1:0] xreg_id_o,
         output logic    [4:0]                        xreg_addr_o,
-        output logic    [31:0]                       xreg_data_o
+        output logic    [31:0]                       xreg_data_o, 
+        
+        output logic                                 echo_start_o,
+		input  logic                                 echo_done_i
     );
 
     generate
@@ -72,6 +75,7 @@ module vproc_unit_wrapper import vproc_pkg::*; #(
             CTRL_T                 unit_out_ctrl;
             logic [MAX_OP_W  -1:0] unit_out_res;
             logic [MAX_OP_W/8-1:0] unit_out_mask;
+            assign echo_start_o = 1'b0;
             vproc_lsu #(
                 .VMEM_W                   ( MAX_OP_W                                    ),
                 .CTRL_T                   ( CTRL_T                                      ),
@@ -186,6 +190,7 @@ module vproc_unit_wrapper import vproc_pkg::*; #(
             CTRL_T                 unit_out_ctrl;
             logic [MAX_OP_W  -1:0] unit_out_res;
             logic [MAX_OP_W/8-1:0] unit_out_mask;
+            assign echo_start_o = 1'b0;
             vproc_mul #(
                 .MUL_OP_W         ( MAX_OP_W                                    ),
                 .MUL_TYPE         ( MUL_TYPE                                    ),
@@ -278,6 +283,9 @@ module vproc_unit_wrapper import vproc_pkg::*; #(
             logic        unit_out_res_valid;
             logic [31:0] unit_out_res;
             logic [3 :0] unit_out_mask;
+            
+            logic echo_start_elem;            
+            
             vproc_elem #(
                 .VREG_W                ( VREG_W                         ),
                 .GATHER_OP_W           ( MAX_OP_W                       ),
@@ -303,8 +311,24 @@ module vproc_unit_wrapper import vproc_pkg::*; #(
                 .pipe_out_xreg_addr_o  ( xreg_addr_o                    ),
                 .pipe_out_res_valid_o  ( unit_out_res_valid             ),
                 .pipe_out_res_o        ( unit_out_res                   ),
-                .pipe_out_mask_o       ( unit_out_mask                  )
+                .pipe_out_mask_o       ( unit_out_mask                  ),
+                
+                .echo_start_o          ( echo_start_elem ),
+	            .echo_done_i           ( echo_done_i     ) 
             );
+            
+            assign echo_start_o = echo_start_elem;
+            
+            // debug Start pulse from ELEM
+		    always_ff @(posedge clk_i) begin
+		        if (pipe_out_valid_o && pipe_out_ready_i) begin
+		            //$display("[%0t] [UNIT_WRAPPER] ELEM out valid+ready → echo_start_int=1", $time);
+		        end
+		        if (echo_done_i) begin
+		            //$display("[%0t] [UNIT_WRAPPER] Received echo_done_i=1", $time);
+		        end
+		    end
+            
             // guard ELEM unit's pipe_out_res_valid_o with its pipe_out_valid_o
             logic res_valid;
             assign res_valid = unit_out_valid & unit_out_res_valid;

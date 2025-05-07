@@ -75,7 +75,10 @@ module vproc_pipeline_wrapper import vproc_pkg::*; #(
         input  logic                    xreg_ready_i,
         output logic [XIF_ID_W-1:0]     xreg_id_o,
         output logic [4:0]              xreg_addr_o,
-        output logic [31:0]             xreg_data_o
+        output logic [31:0]             xreg_data_o,
+        
+        output logic                    echo_start_o,
+		input  logic                    echo_done_i
     );
 
 `ifdef VERILATOR
@@ -564,6 +567,8 @@ module vproc_pipeline_wrapper import vproc_pkg::*; #(
                 .DONT_CARE_ZERO      ( DONT_CARE_ZERO      )
             ) pipeline (
                 .pipe_in_state_i     ( state_init          ),
+                .echo_start_o        ( echo_start_o   ),
+				.echo_done_i         ( echo_done_i    ),
                 .*
             );
         end

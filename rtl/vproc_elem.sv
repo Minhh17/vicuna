@@ -31,7 +31,10 @@ module vproc_elem #(
         output logic [4            :0] pipe_out_xreg_addr_o,
         output logic                   pipe_out_res_valid_o,
         output logic [31           :0] pipe_out_res_o,
-        output logic [3            :0] pipe_out_mask_o
+        output logic [3            :0] pipe_out_mask_o, 
+
+		output logic echo_start_o,
+		input  logic echo_done_i
     );
 
     import vproc_pkg::*;
@@ -301,16 +304,18 @@ module vproc_elem #(
                 result_mask_d  = ~pipe_in_ctrl_i.vl_0;
                 result_valid_d = pipe_in_ctrl_i.last_cycle;
             end
-            ELEM_ECHO_START: begin 
-            	pipe_out_xreg_data_o = 32'hCAFEBABE;   // any number which is not duplicate
-				pipe_out_xreg_valid_o = 1'b1; // ensure enable
-				//$display("ELEM_ECHO_START in vproc_elem catched");
-            end
-            ELEM_ECHO_STOP: begin 
-            	pipe_out_xreg_data_o = 32'h00000001;   // any number which is not duplicate
-				pipe_out_xreg_valid_o = 1'b0; // ensure enable
-				//$display("ELEM_ECHO_STOP in vproc_elem catched");
-            end 	
+            
+            ELEM_ACCEL: begin
+				// phát START đúng 1 chu kỳ khi handshake lệnh
+				echo_start_o = pipe_in_valid_i & pipe_in_ready_o;
+				//$display("ELEM_ACCEL in vproc_elem catched");
+				// chặn pipeline tới khi Echo báo xong
+				if (echo_done_i) begin
+					echo_start_o = 0;
+					result_valid_d = 1'b1;   // WB xong
+					$display("result_valid_d DONE");
+				end
+			end	
             default: ;
 
         endcase

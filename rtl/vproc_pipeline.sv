@@ -91,7 +91,10 @@ module vproc_pipeline import vproc_pkg::*; #(
         input  logic                    xreg_ready_i,
         output logic [XIF_ID_W-1:0]     xreg_id_o,
         output logic [4:0]              xreg_addr_o,
-        output logic [31:0]             xreg_data_o
+        output logic [31:0]             xreg_data_o,
+        
+        output logic                    echo_start_o,
+		input  logic                    echo_done_i
     );
 
     if ((MAX_OP_W & (MAX_OP_W - 1)) != 0 || MAX_OP_W < 32 || MAX_OP_W >= VREG_W) begin
@@ -920,7 +923,11 @@ module vproc_pipeline import vproc_pkg::*; #(
         .xreg_ready_i              ( xreg_ready_i             ),
         .xreg_id_o                 ( xreg_id_o                ),
         .xreg_addr_o               ( xreg_addr_o              ),
-        .xreg_data_o               ( xreg_data_o              )
+        .xreg_data_o               ( xreg_data_o              ), 
+        
+        .echo_start_o              ( echo_start_o       ),
+		.echo_done_i               ( echo_done_i        )
+        
     );
 
 

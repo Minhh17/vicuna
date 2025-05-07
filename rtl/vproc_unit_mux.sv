@@ -64,7 +64,10 @@ module vproc_unit_mux import vproc_pkg::*; #(
         input  logic                                 xreg_ready_i,
         output logic    [XIF_ID_W              -1:0] xreg_id_o,
         output logic    [4:0]                        xreg_addr_o,
-        output logic    [31:0]                       xreg_data_o
+        output logic    [31:0]                       xreg_data_o, 
+        
+        output logic                                 echo_start_o,
+		input  logic                                 echo_done_i
     );
 
     logic [UNIT_CNT-1:0] unit_in_valid;
@@ -97,6 +100,8 @@ module vproc_unit_mux import vproc_pkg::*; #(
     logic      [UNIT_CNT-1:0][1:0]                        unit_out_pend_clear_cnt;
     logic      [UNIT_CNT-1:0]                             unit_out_instr_done;
 
+
+	logic [UNIT_CNT-1:0] echo_start_vec;  // arr of echo_start for each Unit
     generate
         for (genvar i = 0; i < UNIT_CNT; i++) begin
             if (UNITS[i]) begin
@@ -172,7 +177,10 @@ module vproc_unit_mux import vproc_pkg::*; #(
                     .xreg_ready_i              ( xreg_ready                 ),
                     .xreg_id_o                 ( xreg_id                    ),
                     .xreg_addr_o               ( xreg_addr                  ),
-                    .xreg_data_o               ( xreg_data                  )
+                    .xreg_data_o               ( xreg_data                  ),
+                    .echo_start_o ( echo_start_vec[i] ),
+					.echo_done_i  ( echo_done_i        )
+                    
                 );
 
                 if (op_unit'(i) == UNIT_LSU) begin
@@ -210,8 +218,17 @@ module vproc_unit_mux import vproc_pkg::*; #(
                     assign xreg_data_o  = xreg_data;
                 end
             end
+            else begin
+                //  Không có unit tại vị trí i  → buộc bit về 0
+                assign echo_start_vec[i] = 1'b0;
+            end
         end
     endgenerate
+    
+    //------------------------------------------------------------------
+    //  OR-reduce mọi bit  →  echo_start_o (ra ngoài Pipeline)
+    //------------------------------------------------------------------
+    assign echo_start_o = |echo_start_vec;   // reduction-OR
 
     // Get the next valid unit from the unit queue (ensures that instructions
     // enter and exit the unit multiplexer in order; note that instructions
