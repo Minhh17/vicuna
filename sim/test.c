@@ -1,28 +1,40 @@
 #include <stdint.h>
 #include <uart.h>
 
-volatile int32_t data_v0[16] __attribute__ ((aligned (64))) = {999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999};
-volatile int32_t data_v1[16] __attribute__ ((aligned (64))) = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
-volatile int32_t data_v2[16] __attribute__ ((aligned (64))) = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
-volatile int32_t data_v3[16] __attribute__ ((aligned (64))) = {300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300};
-volatile int32_t data_v4[16] __attribute__ ((aligned (64))) = {400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400};
-volatile int32_t data_v5[16] __attribute__ ((aligned (64))) = {500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500};
-volatile int32_t data_v6[16] __attribute__ ((aligned (64))) = {600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600};
-volatile int32_t data_v7[16] __attribute__ ((aligned (64))) = {700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700};
-volatile int32_t data_v8[16] __attribute__ ((aligned (64))) = {800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800};
-volatile int32_t data_v9[16] __attribute__ ((aligned (64))) = {900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900};
-volatile int32_t data_v10[16] __attribute__ ((aligned (64))) = {1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
-volatile int32_t data_v11[16] __attribute__ ((aligned (64))) = {1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100};
-volatile int32_t data_v12[16] __attribute__ ((aligned (64))) = {1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200};
-volatile int32_t data_v13[16] __attribute__ ((aligned (64))) = {1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300};
-volatile int32_t data_v14[16] __attribute__ ((aligned (64))) = {1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400};
-volatile int32_t data_v15[16] __attribute__ ((aligned (64))) = {1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500};
+static inline uint32_t read_mcycle() {
+    uint32_t result;
+    asm volatile ("csrr %0, mcycle" : "=r"(result));
+    return result;
+}
 
-volatile int32_t check_input[16][16] __attribute__ ((aligned (64)));
-volatile int32_t result[16][16] __attribute__ ((aligned (64)));
 
 int main(void) {
+
+	
+	
+	uint32_t start, stop;
+    start = read_mcycle();
     uart_printf("Starting Echo module test in Vicuna (Zve32x)...\n");
+
+	volatile int32_t data_v0[16] __attribute__ ((aligned (64))) = {999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999};
+	volatile int32_t data_v1[16] __attribute__ ((aligned (64))) = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+	volatile int32_t data_v2[16] __attribute__ ((aligned (64))) = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
+	volatile int32_t data_v3[16] __attribute__ ((aligned (64))) = {300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300};
+	volatile int32_t data_v4[16] __attribute__ ((aligned (64))) = {400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400};
+	volatile int32_t data_v5[16] __attribute__ ((aligned (64))) = {500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500};
+	volatile int32_t data_v6[16] __attribute__ ((aligned (64))) = {600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600};
+	volatile int32_t data_v7[16] __attribute__ ((aligned (64))) = {700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700};
+	volatile int32_t data_v8[16] __attribute__ ((aligned (64))) = {800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800};
+	volatile int32_t data_v9[16] __attribute__ ((aligned (64))) = {900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900};
+	volatile int32_t data_v10[16] __attribute__ ((aligned (64))) = {1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
+	volatile int32_t data_v11[16] __attribute__ ((aligned (64))) = {1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100};
+	volatile int32_t data_v12[16] __attribute__ ((aligned (64))) = {1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200};
+	volatile int32_t data_v13[16] __attribute__ ((aligned (64))) = {1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300, 1300};
+	volatile int32_t data_v14[16] __attribute__ ((aligned (64))) = {1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400};
+	volatile int32_t data_v15[16] __attribute__ ((aligned (64))) = {1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500};
+
+	volatile int32_t check_input[16][16] __attribute__ ((aligned (64)));
+	volatile int32_t result[16][16] __attribute__ ((aligned (64)));
 
     // In địa chỉ của các mảng
     uart_printf("Addresses of data arrays:\n");
@@ -43,6 +55,8 @@ int main(void) {
     uart_printf("data_v14: 0x%x\n", (uint32_t)data_v14);
     uart_printf("data_v15: 0x%x\n", (uint32_t)data_v15);
 
+	
+    
     // In dữ liệu từ data_v0 đến data_v15
     uart_printf("Data in memory before loading:\n");
     uart_printf("data_v0: ");
@@ -308,8 +322,12 @@ int main(void) {
         }
         uart_printf("\n");
     }
+    
+    stop = read_mcycle();
+    uart_printf("scalar cycles: %u\n", stop - start);
+    
+    while (1) {};
 
-    while (1) {}
     return 0;
 }
 

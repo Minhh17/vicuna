@@ -27,25 +27,25 @@ VPROC_CONFIG ?= compact
 ifeq ($(VPROC_CONFIG), compact)
   VPORT_POLICY    ?= some
   VMEM_W          ?= 32
-  VREG_W          ?= 128
+  VREG_W          ?= 512
   VPROC_PIPELINES ?= $(VMEM_W):VLSU,VALU,VMUL,VSLD,VELEM
 else
 ifeq ($(VPROC_CONFIG), dual)
   VPORT_POLICY    ?= some
   VMEM_W          ?= 32
-  VREG_W          ?= 128
+  VREG_W          ?= 512
   VPROC_PIPELINES ?= $(VMEM_W):VLSU,VALU,VELEM $(VPIPE_W_VMUL):VMUL,VSLD
 else
 ifeq ($(VPROC_CONFIG), triple)
   VPORT_POLICY    ?= some
   VMEM_W          ?= 32
-  VREG_W          ?= 256
+  VREG_W          ?= 512
   VPROC_PIPELINES ?= $(VMEM_W):VLSU $(VPIPE_W_DFLT):VALU,VELEM $(VPIPE_W_VMUL):VMUL,VSLD
 else
 ifeq ($(VPROC_CONFIG), legacy)
   VPORT_POLICY    ?= some
   VMEM_W          ?= 32
-  VREG_W          ?= 128
+  VREG_W          ?= 512
   VPROC_PIPELINES ?= $(VMEM_W):VLSU $(VPIPE_W_DFLT):VALU $(VPIPE_W_VMUL):VMUL                     \
                                     $(VPIPE_W_DFLT):VSLD 32:VELEM
 else
@@ -90,8 +90,8 @@ $(VPROC_CONFIG_PKG):
 	echo "// Configuration details:"                                                        >>$@; \
 	echo "// - Vector register width: $(VREG_W) bits"                                       >>$@; \
 	echo "// - Vector pipelines:"                                                           >>$@; \
-	vport_rd_cnt=1;                                                                               \
-	vport_wr_capacities="";                                                                       \
+	vport_rd_cnt=15;                                                                               \
+	vport_wr_capacities=16;                                                                       \
 	pipe_cnt=0;                                                                                   \
 	pipe_units="";                                                                                \
 	pipe_widths="";                                                                               \

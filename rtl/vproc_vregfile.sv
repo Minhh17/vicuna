@@ -107,7 +107,7 @@ module vproc_vregfile #(
                         always_ff @(posedge clk_i) begin
                             for (int i = 0; i < MAX_PORT_W / 8; i++) begin
                                 if (wr_we_i[gw] & wr_be_i[gw][i]) begin
-                                    ram[wr_addr_i[gw]][i*8 +: 8] <= wr_data[i*8 +: 8];
+                                    ram[wr_addr_i[gw]][i*8 +: 8] <= wr_data[i*8 +: 8];  // write each byte continous into RAM at addr input
                                 end
                             end
                         end
@@ -116,45 +116,88 @@ module vproc_vregfile #(
                 end
 
                 vproc_pkg::VREG_XLNX_RAM32M: begin
-                    // use Xilinx's 2-bit wide by 32-deep RAM32M primitive with
-                    // one write port and three independent read ports
-                    for (genvar gr = 0; gr < (PORT_RD_CNT_TOTAL + 2) / 3; gr++) begin
-                        for (genvar gm = 0; gm < MAX_PORT_W / 2; gm++) begin
-                            logic [MAX_ADDR_W-1:0] rd_addr_0, rd_addr_1, rd_addr_2;
-                            logic [           1:0] rd_data_0, rd_data_1, rd_data_2;
-                            RAM32M xlnx_ram32m_inst (
+                    // use Xilinx's 16-bit wide by 32-deep RAM32M16 primitive with
+                    // one write port and eight independent read ports
+                    for (genvar gr = 0; gr < (PORT_RD_CNT_TOTAL + 7) / 8; gr++) begin
+                        for (genvar gm = 0; gm < MAX_PORT_W / 16; gm++) begin
+                            logic [MAX_ADDR_W-1:0] rd_addr_0, rd_addr_1, rd_addr_2, rd_addr_3, rd_addr_4, rd_addr_5, rd_addr_6, rd_addr_7;
+                            logic [          15:0] rd_data_0, rd_data_1, rd_data_2, rd_data_3, rd_data_4, rd_data_5, rd_data_6, rd_data_7;
+                            RAM32M16 xlnx_ram32m16_inst (
                                 .DOA    ( rd_data_0                       ),
                                 .DOB    ( rd_data_1                       ),
                                 .DOC    ( rd_data_2                       ),
-                                .DOD    (                                 ),
+                                .DOD    ( rd_data_3                       ),
+                                .DOE    ( rd_data_4                       ),
+                                .DOF    ( rd_data_5                       ),
+                                .DOG    ( rd_data_6                       ),
+                                .DOH    ( rd_data_7                       ),
                                 .ADDRA  ( rd_addr_0                       ),
                                 .ADDRB  ( rd_addr_1                       ),
                                 .ADDRC  ( rd_addr_2                       ),
-                                .ADDRD  ( wr_addr_i[gw]                   ),
-                                .DIA    ( wr_data[2*gm +: 2]              ),
-                                .DIB    ( wr_data[2*gm +: 2]              ),
-                                .DIC    ( wr_data[2*gm +: 2]              ),
-                                .DID    ( wr_data[2*gm +: 2]              ),
+                                .ADDRD  ( rd_addr_3                       ),
+                                .ADDRE  ( rd_addr_4                       ),
+                                .ADDRF  ( rd_addr_5                       ),
+                                .ADDRG  ( rd_addr_6                       ),
+                                .ADDRH  ( rd_addr_7                       ),
+                                .DIA    ( wr_data[16*gm +: 16]            ),
+                                .DIB    ( wr_data[16*gm +: 16]            ),
+                                .DIC    ( wr_data[16*gm +: 16]            ),
+                                .DID    ( wr_data[16*gm +: 16]            ),
+                                .DIE    ( wr_data[16*gm +: 16]            ),
+                                .DIF    ( wr_data[16*gm +: 16]            ),
+                                .DIG    ( wr_data[16*gm +: 16]            ),
+                                .DIH    ( wr_data[16*gm +: 16]            ),
                                 .WCLK   ( clk_i                           ),
-                                .WE     ( wr_we_i[gw] & wr_be_i[gw][gm/4] )
+                                .WE     ( wr_we_i[gw] & wr_be_i[gw][gm/2] )
                             );
-                            assign rd_addr_0                    = rd_addr[gr*3][gw];
-                            assign rd_data[gr*3][gw][2*gm +: 2] = rd_data_0;
-                            if (gr*3+1 < PORT_RD_CNT_TOTAL) begin
-                                assign rd_addr_1                      = rd_addr[gr*3+1][gw];
-                                assign rd_data[gr*3+1][gw][2*gm +: 2] = rd_data_1;
+                            assign rd_addr_0                      = rd_addr[gr*8][gw];
+                            assign rd_data[gr*8][gw][16*gm +: 16] = rd_data_0;
+                            if (gr*8+1 < PORT_RD_CNT_TOTAL) begin
+                                assign rd_addr_1                        = rd_addr[gr*8+1][gw];
+                                assign rd_data[gr*8+1][gw][16*gm +: 16] = rd_data_1;
                             end else begin
-                                assign rd_addr_1                      = '0;
+                                assign rd_addr_1                        = '0;
                             end
-                            if (gr*3+2 < PORT_RD_CNT_TOTAL) begin
-                                assign rd_addr_2                      = rd_addr[gr*3+2][gw];
-                                assign rd_data[gr*3+2][gw][2*gm +: 2] = rd_data_2;
+                            if (gr*8+2 < PORT_RD_CNT_TOTAL) begin
+                                assign rd_addr_2                        = rd_addr[gr*8+2][gw];
+                                assign rd_data[gr*8+2][gw][16*gm +: 16] = rd_data_2;
                             end else begin
-                                assign rd_addr_2                      = '0;
+                                assign rd_addr_2                        = '0;
+                            end
+                            if (gr*8+3 < PORT_RD_CNT_TOTAL) begin
+                                assign rd_addr_3                        = rd_addr[gr*8+3][gw];
+                                assign rd_data[gr*8+3][gw][16*gm +: 16] = rd_data_3;
+                            end else begin
+                                assign rd_addr_3                        = '0;
+                            end
+                            if (gr*8+4 < PORT_RD_CNT_TOTAL) begin
+                                assign rd_addr_4                        = rd_addr[gr*8+4][gw];
+                                assign rd_data[gr*8+4][gw][16*gm +: 16] = rd_data_4;
+                            end else begin
+                                assign rd_addr_4                        = '0;
+                            end
+                            if (gr*8+5 < PORT_RD_CNT_TOTAL) begin
+                                assign rd_addr_5                        = rd_addr[gr*8+5][gw];
+                                assign rd_data[gr*8+5][gw][16*gm +: 16] = rd_data_5;
+                            end else begin
+                                assign rd_addr_5                        = '0;
+                            end
+                            if (gr*8+6 < PORT_RD_CNT_TOTAL) begin
+                                assign rd_addr_6                        = rd_addr[gr*8+6][gw];
+                                assign rd_data[gr*8+6][gw][16*gm +: 16] = rd_data_6;
+                            end else begin
+                                assign rd_addr_6                        = '0;
+                            end
+                            if (gr*8+7 < PORT_RD_CNT_TOTAL) begin
+                                assign rd_addr_7                        = rd_addr[gr*8+7][gw];
+                                assign rd_data[gr*8+7][gw][16*gm +: 16] = rd_data_7;
+                            end else begin
+                                assign rd_addr_7                        = '0;
                             end
                         end
                     end
                 end
+
 
                 vproc_pkg::VREG_ASIC: begin
                     for (genvar gr = 0; gr < PORT_RD_CNT_TOTAL; gr++) begin
